@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagesManager", "PagesManager\PagesManager.csproj", "{0BCB2DB3-B479-4AC8-85DA-9DC6546FDFD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagesManager.Core", "PagesManager.Core\PagesManager.Core.csproj", "{4236C670-1AD0-486F-906A-7090F2BFF8B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PagesManager.Tests", "PagesManager.Tests\PagesManager.Tests.csproj", "{27728B47-4388-489B-95E4-3A2C7D81716D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BCB2DB3-B479-4AC8-85DA-9DC6546FDFD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BCB2DB3-B479-4AC8-85DA-9DC6546FDFD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BCB2DB3-B479-4AC8-85DA-9DC6546FDFD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BCB2DB3-B479-4AC8-85DA-9DC6546FDFD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4236C670-1AD0-486F-906A-7090F2BFF8B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4236C670-1AD0-486F-906A-7090F2BFF8B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4236C670-1AD0-486F-906A-7090F2BFF8B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4236C670-1AD0-486F-906A-7090F2BFF8B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27728B47-4388-489B-95E4-3A2C7D81716D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27728B47-4388-489B-95E4-3A2C7D81716D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27728B47-4388-489B-95E4-3A2C7D81716D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27728B47-4388-489B-95E4-3A2C7D81716D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
