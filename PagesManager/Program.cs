@@ -25,6 +25,7 @@ internal class Program
             .AddPagesManagerViewModels();
 
         services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
+        services.AddSingleton<IImagePreviewService, AvaloniaImagePreviewService>();
         })
         .Build();
 

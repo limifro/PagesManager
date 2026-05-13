@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,9 +16,12 @@ public partial class NoteEditorViewModel : ViewModelBase
 {
     private readonly INoteService _noteService;
     private readonly IFilePickerService _filePicker;
+    private readonly IImagePreviewService _imagePreviewService;
     private readonly IMessenger _messenger;
 
     private Note? _currentNote;
+
+    private readonly HashSet<int> _pendingDeletedAttachmentIds = new();
 
     [ObservableProperty]
     private string _title = string.Empty;
@@ -38,10 +43,12 @@ public partial class NoteEditorViewModel : ViewModelBase
     public NoteEditorViewModel(
         INoteService noteService,
         IFilePickerService filePicker,
+        IImagePreviewService imagePreviewService,
         IMessenger messenger)
     {
         _noteService = noteService;
         _filePicker = filePicker;
+        _imagePreviewService = imagePreviewService;
         _messenger = messenger;
     }
 
@@ -50,6 +57,8 @@ public partial class NoteEditorViewModel : ViewModelBase
     public void Load(Note note)
     {
         _currentNote = note ?? throw new ArgumentNullException(nameof(note));
+        _pendingDeletedAttachmentIds.Clear();
+
         Title = note.Title;
         Content = note.Content;
         FontSize = note.FontSize;
@@ -64,6 +73,8 @@ public partial class NoteEditorViewModel : ViewModelBase
     public void Clear()
     {
         _currentNote = null;
+        _pendingDeletedAttachmentIds.Clear();
+
         Title = string.Empty;
         Content = string.Empty;
         FontSize = 14;
@@ -83,7 +94,22 @@ public partial class NoteEditorViewModel : ViewModelBase
         _currentNote.FontFamily = FontFamily;
 
         await _noteService.UpdateAsync(_currentNote);
-        _messenger.Send(new NoteSavedMessage(_currentNote));
+
+        foreach (var attachmentId in _pendingDeletedAttachmentIds.ToList())
+        {
+            await _noteService.RemoveAttachmentAsync(attachmentId);
+        }
+
+        var refreshed = await _noteService.GetByIdAsync(_currentNote.Id);
+        if (refreshed is not null)
+        {
+            Load(refreshed);
+            _messenger.Send(new NoteSavedMessage(refreshed));
+        }
+        else
+        {
+            _pendingDeletedAttachmentIds.Clear();
+        }
     }
 
     [RelayCommand]
@@ -103,13 +129,8 @@ public partial class NoteEditorViewModel : ViewModelBase
         if (_currentNote is null) return;
 
         await _noteService.TogglePinAsync(_currentNote.Id);
-
-        var updated = await _noteService.GetByIdAsync(_currentNote.Id);
-        if (updated is not null)
-        {
-            _currentNote = updated;
-            _messenger.Send(new NoteSavedMessage(_currentNote));
-        }
+        _currentNote.IsPinned = !_currentNote.IsPinned;
+        _messenger.Send(new NoteSavedMessage(_currentNote));
     }
 
     [RelayCommand]
@@ -137,13 +158,22 @@ public partial class NoteEditorViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task RemoveAttachmentAsync(AttachmentViewModel? attachment)
+    private Task RemoveAttachmentAsync(AttachmentViewModel? attachment)
     {
-        if (attachment is null || _currentNote is null) return;
+        if (attachment is null || _currentNote is null)
+            return Task.CompletedTask;
 
-        await _noteService.RemoveAttachmentAsync(attachment.Id);
+        _pendingDeletedAttachmentIds.Add(attachment.Id);
         Attachments.Remove(attachment);
-        _currentNote.Attachments.RemoveAll(a => a.Id == attachment.Id);
-        _messenger.Send(new NoteSavedMessage(_currentNote));
+
+        return Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    private async Task OpenAttachmentPreviewAsync(AttachmentViewModel? attachment)
+    {
+        if (attachment is null) return;
+
+        await _imagePreviewService.ShowAsync(attachment.FilePath, attachment.FileName);
     }
 }

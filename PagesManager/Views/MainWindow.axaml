@@ -15,6 +15,7 @@
     </Window.Resources>
 
     <Grid ColumnDefinitions="280,*" Name="RootGrid">
+
         <Border Grid.Column="0" Background="#F4F4F6" Padding="8">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Top" Spacing="6">
@@ -57,7 +58,7 @@
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8">
                     <Button Content="Сохранить" Command="{Binding NoteEditor.SaveCommand}"/>
                     <Button Content="Удалить" Command="{Binding NoteEditor.DeleteCommand}"/>
-                    <Button Content="📌" Command="{Binding NoteEditor.TogglePinCommand}"/>
+                    <Button Content="Закрепить" Command="{Binding NoteEditor.TogglePinCommand}"/>
                     <Button Content="Прикрепить фото" Command="{Binding NoteEditor.AttachImageCommand}"/>
                 </StackPanel>
 
@@ -85,18 +86,27 @@
                                             BorderBrush="#E0E0E0"
                                             BorderThickness="1">
                                         <Grid Width="180" Height="180">
-                                            <Image Source="{Binding FilePath, Converter={StaticResource PathToBitmap}}"
-                                                   Stretch="UniformToFill"/>
+
+                                            <Button Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Padding="0"
+                                                    Command="{Binding #RootGrid.((vm:MainWindowViewModel)DataContext).NoteEditor.OpenAttachmentPreviewCommand}"
+                                                    CommandParameter="{Binding}">
+                                                <Image Source="{Binding FilePath, Converter={StaticResource PathToBitmap}}"
+                                                       Stretch="UniformToFill"/>
+                                            </Button>
+
                                             <Button Content="✕"
                                                     HorizontalAlignment="Right"
                                                     VerticalAlignment="Top"
-                                                    Margin="4"
+                                                    Margin="6"
                                                     Padding="6,2"
-                                                    Background="#80000000"
+                                                    Background="#AA000000"
                                                     Foreground="White"
-                                                    CornerRadius="12"
+                                                    BorderThickness="0"
                                                     Command="{Binding #RootGrid.((vm:MainWindowViewModel)DataContext).NoteEditor.RemoveAttachmentCommand}"
-                                                    CommandParameter="{Binding}"/>
+                                                    CommandParameter="{Binding}"
+                                                    ZIndex="1"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -111,7 +121,6 @@
                                  MinHeight="200"
                                  BorderThickness="0"
                                  Background="Transparent"/>
-
                     </StackPanel>
                 </ScrollViewer>
 
