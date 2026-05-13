@@ -2,8 +2,63 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="clr-namespace:PagesManager.Core.ViewModels;assembly=PagesManager.Core"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
         x:Class="PagesManager.Views.MainWindow"
-        Title="PagesManager">
-    <TextBlock Text="Welcome to Avalonia!" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        x:DataType="vm:MainWindowViewModel"
+        Width="900" Height="600"
+        Title="Pages Manager">
+
+    <Grid ColumnDefinitions="280,*">
+        <Border Grid.Column="0" Background="#F4F4F6" Padding="8">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Spacing="6">
+                    <TextBlock Text="Заметки" FontSize="20" FontWeight="Bold"/>
+                    <Button Content="+ Новая заметка"
+                            Command="{Binding NoteList.CreateNoteCommand}"
+                            HorizontalAlignment="Stretch"/>
+                    <TextBox PlaceholderText="Поиск..."
+                             Text="{Binding NoteList.SearchQuery, Mode=TwoWay}"/>
+                    <Button Content="Найти"
+                            Command="{Binding NoteList.SearchCommand}"
+                            HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <ListBox ItemsSource="{Binding NoteList.Notes}"
+                         SelectedItem="{Binding NoteList.SelectedNote, Mode=TwoWay}"
+                         Margin="0,8,0,0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="vm:NoteListItemViewModel">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Preview}" FontSize="12" Foreground="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Column="1" Padding="16">
+            <DockPanel IsVisible="{Binding NoteEditor.HasNote}">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8">
+                    <Button Content="Сохранить" Command="{Binding NoteEditor.SaveCommand}"/>
+                    <Button Content="Удалить" Command="{Binding NoteEditor.DeleteCommand}"/>
+                    <Button Content="Закрепить" Command="{Binding NoteEditor.TogglePinCommand}"/>
+                </StackPanel>
+
+                <TextBox DockPanel.Dock="Top"
+                         Text="{Binding NoteEditor.Title, Mode=TwoWay}"
+                         FontSize="20" FontWeight="Bold"
+                         PlaceholderText="Заголовок"
+                         Margin="0,12,0,8"/>
+
+                <TextBox Text="{Binding NoteEditor.Content, Mode=TwoWay}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         FontSize="{Binding NoteEditor.FontSize}"
+                         PlaceholderText="Начните писать..."/>
+            </DockPanel>
+        </Border>
+    </Grid>
 </Window>

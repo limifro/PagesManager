@@ -1,24 +1,41 @@
-﻿using Avalonia;
-using System;
+﻿using System;
+using Avalonia;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using PagesManager.Core;
+using PagesManager.Core.Data;
 
 namespace PagesManager;
 
-class Program
+internal class Program
 {
-    // Initialization code. Don't use any Avalonia, third-party APIs or any
-    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-    // yet and stuff might break.
-    [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+    public static IHost? AppHost { get; private set; }
 
-    // Avalonia configuration, don't remove; also used by visual designer.
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        AppHost = Host.CreateDefaultBuilder(args)
+            .ConfigureServices((_, services) =>
+            {
+                services
+                    .AddPagesManagerCore()
+                    .AddPagesManagerViewModels();
+            })
+            .Build();
+
+        using (var scope = AppHost.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.Migrate();
+        }
+
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    }
+
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-#if DEBUG
-            .WithDeveloperTools()
-#endif
             .WithInterFont()
             .LogToTrace();
 }
