@@ -46,20 +46,19 @@ public class NoteRepository : INoteRepository
     public async Task UpdateAsync(Note note, CancellationToken ct = default)
     {
     if (note is null) throw new ArgumentNullException(nameof(note));
-    var tracked = await _db.Notes.FindAsync(new object[] { note.Id }, ct);
-    if (tracked is not null && !ReferenceEquals(tracked, note))
+
+    var tracked = await _db.Notes.FirstOrDefaultAsync(n => n.Id == note.Id, ct);
+    if (tracked is null)
     {
-        tracked.Title = note.Title;
-        tracked.Content = note.Content;
-        tracked.FontFamily = note.FontFamily;
-        tracked.FontSize = note.FontSize;
-        tracked.IsPinned = note.IsPinned;
-        tracked.UpdatedAt = note.UpdatedAt;
+        return;
     }
-    else
-    {
-        _db.Notes.Update(note);
-    }
+
+    tracked.Title = note.Title;
+    tracked.Content = note.Content;
+    tracked.FontFamily = note.FontFamily;
+    tracked.FontSize = note.FontSize;
+    tracked.IsPinned = note.IsPinned;
+    tracked.UpdatedAt = note.UpdatedAt;
 
     await _db.SaveChangesAsync(ct);
     }

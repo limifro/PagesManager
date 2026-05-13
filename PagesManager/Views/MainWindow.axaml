@@ -54,7 +54,6 @@
         <Border Grid.Column="1" Padding="16">
             <DockPanel IsVisible="{Binding NoteEditor.HasNote}">
 
-                <!-- Тулбар сверху -->
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8">
                     <Button Content="Сохранить" Command="{Binding NoteEditor.SaveCommand}"/>
                     <Button Content="Удалить" Command="{Binding NoteEditor.DeleteCommand}"/>
@@ -68,49 +67,54 @@
                          PlaceholderText="Заголовок"
                          Margin="0,12,0,8"/>
 
-                <Border DockPanel.Dock="Bottom"
-                        IsVisible="{Binding NoteEditor.Attachments.Count}"
-                        BorderBrush="#E0E0E0" BorderThickness="0,1,0,0"
-                        Padding="0,8,0,0" Margin="0,8,0,0">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                  VerticalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding NoteEditor.Attachments}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="12">
+
+                        <ItemsControl ItemsSource="{Binding NoteEditor.Attachments}"
+                                      IsVisible="{Binding NoteEditor.Attachments.Count}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="8"/>
+                                    <WrapPanel Orientation="Horizontal"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:AttachmentViewModel">
-                                    <Border BorderBrush="#D0D0D0" BorderThickness="1"
-                                            CornerRadius="6" Padding="4" Width="120">
-                                        <DockPanel>
-                                            <Button DockPanel.Dock="Top"
-                                                    Content="✕"
+                                    <Border Margin="0,0,8,8"
+                                            CornerRadius="8"
+                                            ClipToBounds="True"
+                                            BorderBrush="#E0E0E0"
+                                            BorderThickness="1">
+                                        <Grid Width="180" Height="180">
+                                            <Image Source="{Binding FilePath, Converter={StaticResource PathToBitmap}}"
+                                                   Stretch="UniformToFill"/>
+                                            <Button Content="✕"
                                                     HorizontalAlignment="Right"
-                                                    Padding="4,0"
+                                                    VerticalAlignment="Top"
+                                                    Margin="4"
+                                                    Padding="6,2"
+                                                    Background="#80000000"
+                                                    Foreground="White"
+                                                    CornerRadius="12"
                                                     Command="{Binding #RootGrid.((vm:MainWindowViewModel)DataContext).NoteEditor.RemoveAttachmentCommand}"
                                                     CommandParameter="{Binding}"/>
-                                            <Image Source="{Binding FilePath, Converter={StaticResource PathToBitmap}}"
-                                                   Stretch="UniformToFill"
-                                                   Height="80"/>
-                                            <TextBlock Text="{Binding FileName}"
-                                                       FontSize="10"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       DockPanel.Dock="Bottom"/>
-                                        </DockPanel>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </ScrollViewer>
-                </Border>
 
-                <TextBox Text="{Binding NoteEditor.Content, Mode=TwoWay}"
-                         AcceptsReturn="True"
-                         TextWrapping="Wrap"
-                         FontSize="{Binding NoteEditor.FontSize}"
-                         PlaceholderText="Начните писать..."/>
+                        <TextBox Text="{Binding NoteEditor.Content, Mode=TwoWay}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 FontSize="{Binding NoteEditor.FontSize}"
+                                 PlaceholderText="Начните писать..."
+                                 MinHeight="200"
+                                 BorderThickness="0"
+                                 Background="Transparent"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+
             </DockPanel>
         </Border>
     </Grid>
