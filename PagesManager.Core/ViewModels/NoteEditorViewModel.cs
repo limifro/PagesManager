@@ -87,10 +87,15 @@ public partial class NoteEditorViewModel : ViewModelBase
     [RelayCommand]
     private async Task TogglePinAsync()
     {
-        if (_currentNote is null) return;
+    if (_currentNote is null) return;
 
-        await _noteService.TogglePinAsync(_currentNote.Id);
-        _currentNote.IsPinned = !_currentNote.IsPinned;
+    await _noteService.TogglePinAsync(_currentNote.Id);
+
+    var updated = await _noteService.GetByIdAsync(_currentNote.Id);
+    if (updated is not null)
+    {
+        _currentNote = updated;
         _messenger.Send(new NoteSavedMessage(_currentNote));
+    }
     }
 }

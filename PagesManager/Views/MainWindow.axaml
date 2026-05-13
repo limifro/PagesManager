@@ -30,10 +30,20 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="vm:NoteListItemViewModel">
                             <StackPanel>
-                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
-                                <TextBlock Text="{Binding Preview}" FontSize="12" Foreground="Gray"/>
-                            </StackPanel>
-                        </DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="📌" 
+                                            IsVisible="{Binding IsPinned}" 
+                                            FontSize="12"/>
+                                    <TextBlock Text="{Binding Title}" 
+                                            FontWeight="SemiBold"
+                                            TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Preview}" 
+                                        FontSize="12" 
+                                        Foreground="Gray"
+                                        TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </DockPanel>

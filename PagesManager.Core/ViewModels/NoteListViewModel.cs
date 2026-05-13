@@ -69,13 +69,27 @@ public partial class NoteListViewModel : ViewModelBase
 
     private void OnNoteSaved(NoteSavedMessage m)
     {
-        var existing = Notes.FirstOrDefault(n => n.Model.Id == m.Note.Id);
-        if (existing is not null)
-        {
-            existing.Refresh();
-        }
+    var existing = Notes.FirstOrDefault(n => n.Model.Id == m.Note.Id);
+    if (existing is not null)
+    {
+        existing.Refresh();
+        ResortNotes();
     }
+    }
+    private void ResortNotes()
+    {
+    var sorted = Notes
+        .OrderByDescending(n => n.IsPinned)
+        .ThenByDescending(n => n.UpdatedAt)
+        .ToList();
 
+    for (int i = 0; i < sorted.Count; i++)
+    {
+        var currentIndex = Notes.IndexOf(sorted[i]);
+        if (currentIndex != i)
+            Notes.Move(currentIndex, i);
+    }
+    }
     private void OnNoteDeleted(NoteDeletedMessage m)
     {
         var existing = Notes.FirstOrDefault(n => n.Model.Id == m.NoteId);

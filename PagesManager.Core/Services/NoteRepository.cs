@@ -45,10 +45,23 @@ public class NoteRepository : INoteRepository
 
     public async Task UpdateAsync(Note note, CancellationToken ct = default)
     {
-        if (note is null) throw new ArgumentNullException(nameof(note));
-
+    if (note is null) throw new ArgumentNullException(nameof(note));
+    var tracked = await _db.Notes.FindAsync(new object[] { note.Id }, ct);
+    if (tracked is not null && !ReferenceEquals(tracked, note))
+    {
+        tracked.Title = note.Title;
+        tracked.Content = note.Content;
+        tracked.FontFamily = note.FontFamily;
+        tracked.FontSize = note.FontSize;
+        tracked.IsPinned = note.IsPinned;
+        tracked.UpdatedAt = note.UpdatedAt;
+    }
+    else
+    {
         _db.Notes.Update(note);
-        await _db.SaveChangesAsync(ct);
+    }
+
+    await _db.SaveChangesAsync(ct);
     }
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
@@ -62,16 +75,20 @@ public class NoteRepository : INoteRepository
 
     public async Task<IReadOnlyList<Note>> SearchAsync(string query, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(query))
-            return await GetAllAsync(ct);
+    if (string.IsNullOrWhiteSpace(query))
+        return await GetAllAsync(ct);
 
-        var q = query.Trim().ToLower();
+    var q = query.Trim();
 
-        return await _db.Notes
-            .Include(n => n.Attachments)
-            .Where(n => n.Title.ToLower().Contains(q) || n.Content.ToLower().Contains(q))
-            .OrderByDescending(n => n.IsPinned)
-            .ThenByDescending(n => n.UpdatedAt)
-            .ToListAsync(ct);
+    var all = await _db.Notes
+        .Include(n => n.Attachments)
+        .ToListAsync(ct);
+
+    return all
+        .Where(n => (n.Title?.IndexOf(q, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0
+                 || (n.Content?.IndexOf(q, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0)
+        .OrderByDescending(n => n.IsPinned)
+        .ThenByDescending(n => n.UpdatedAt)
+        .ToList();
     }
 }
