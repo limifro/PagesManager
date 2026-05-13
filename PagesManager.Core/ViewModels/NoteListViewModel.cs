@@ -1,5 +1,7 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -13,6 +15,7 @@ public partial class NoteListViewModel : ViewModelBase
 {
     private readonly INoteService _noteService;
     private readonly IMessenger _messenger;
+    private CancellationTokenSource? _searchCts;
 
     public ObservableCollection<NoteListItemViewModel> Notes { get; } = new();
 
@@ -21,6 +24,7 @@ public partial class NoteListViewModel : ViewModelBase
 
     [ObservableProperty]
     private string _searchQuery = string.Empty;
+    public int SearchDebounceMs { get; set; } = 150;
 
     public NoteListViewModel(INoteService noteService, IMessenger messenger)
     {
@@ -37,19 +41,40 @@ public partial class NoteListViewModel : ViewModelBase
             _messenger.Send(new NoteSelectedMessage(value.Model));
     }
 
-    public async Task LoadAsync()
+    partial void OnSearchQueryChanged(string value)
+    {
+        _ = DebouncedSearchAsync();
+    }
+
+    private async Task DebouncedSearchAsync()
+    {
+        _searchCts?.Cancel();
+        _searchCts = new CancellationTokenSource();
+        var token = _searchCts.Token;
+
+        try
+        {
+            await Task.Delay(SearchDebounceMs, token);
+            if (token.IsCancellationRequested) return;
+            await LoadAsync(token);
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    public async Task LoadAsync(CancellationToken ct = default)
     {
         var items = string.IsNullOrWhiteSpace(SearchQuery)
-            ? await _noteService.GetAllAsync()
-            : await _noteService.SearchAsync(SearchQuery);
+            ? await _noteService.GetAllAsync(ct)
+            : await _noteService.SearchAsync(SearchQuery, ct);
+
+        if (ct.IsCancellationRequested) return;
 
         Notes.Clear();
         foreach (var n in items)
             Notes.Add(new NoteListItemViewModel(n));
     }
-
-    [RelayCommand]
-    private async Task SearchAsync() => await LoadAsync();
 
     [RelayCommand]
     private async Task CreateNoteAsync()
@@ -69,27 +94,14 @@ public partial class NoteListViewModel : ViewModelBase
 
     private void OnNoteSaved(NoteSavedMessage m)
     {
-    var existing = Notes.FirstOrDefault(n => n.Model.Id == m.Note.Id);
-    if (existing is not null)
-    {
-        existing.Refresh();
-        ResortNotes();
+        var existing = Notes.FirstOrDefault(n => n.Model.Id == m.Note.Id);
+        if (existing is not null)
+        {
+            existing.Refresh();
+            ResortNotes();
+        }
     }
-    }
-    private void ResortNotes()
-    {
-    var sorted = Notes
-        .OrderByDescending(n => n.IsPinned)
-        .ThenByDescending(n => n.UpdatedAt)
-        .ToList();
 
-    for (int i = 0; i < sorted.Count; i++)
-    {
-        var currentIndex = Notes.IndexOf(sorted[i]);
-        if (currentIndex != i)
-            Notes.Move(currentIndex, i);
-    }
-    }
     private void OnNoteDeleted(NoteDeletedMessage m)
     {
         var existing = Notes.FirstOrDefault(n => n.Model.Id == m.NoteId);
@@ -98,5 +110,20 @@ public partial class NoteListViewModel : ViewModelBase
 
         if (SelectedNote == existing)
             SelectedNote = null;
+    }
+
+    private void ResortNotes()
+    {
+        var sorted = Notes
+            .OrderByDescending(n => n.IsPinned)
+            .ThenByDescending(n => n.UpdatedAt)
+            .ToList();
+
+        for (int i = 0; i < sorted.Count; i++)
+        {
+            var currentIndex = Notes.IndexOf(sorted[i]);
+            if (currentIndex != i)
+                Notes.Move(currentIndex, i);
+        }
     }
 }

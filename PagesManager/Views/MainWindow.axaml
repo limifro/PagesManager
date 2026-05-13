@@ -12,16 +12,13 @@
     <Grid ColumnDefinitions="280,*">
         <Border Grid.Column="0" Background="#F4F4F6" Padding="8">
             <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Spacing="6">
+               <StackPanel DockPanel.Dock="Top" Spacing="6">
                     <TextBlock Text="Заметки" FontSize="20" FontWeight="Bold"/>
-                    <Button Content="+ Новая заметка"
-                            Command="{Binding NoteList.CreateNoteCommand}"
-                            HorizontalAlignment="Stretch"/>
-                    <TextBox PlaceholderText="Поиск..."
-                             Text="{Binding NoteList.SearchQuery, Mode=TwoWay}"/>
-                    <Button Content="Найти"
-                            Command="{Binding NoteList.SearchCommand}"
-                            HorizontalAlignment="Stretch"/>
+                        <Button Content="+ Новая заметка"
+                                Command="{Binding NoteList.CreateNoteCommand}"
+                                HorizontalAlignment="Stretch"/>
+                        <TextBox PlaceholderText="Поиск..."
+                            Text="{Binding NoteList.SearchQuery, Mode=TwoWay}"/>
                 </StackPanel>
 
                 <ListBox ItemsSource="{Binding NoteList.Notes}"
