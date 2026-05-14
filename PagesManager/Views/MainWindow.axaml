@@ -4,15 +4,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:PagesManager.Core.ViewModels;assembly=PagesManager.Core"
         xmlns:conv="clr-namespace:PagesManager.Converters"
-        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="650"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="700"
         x:Class="PagesManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Width="1000" Height="650"
+        Width="1100" Height="700"
         Title="Pages Manager">
 
     <Window.Resources>
         <conv:PathToBitmapConverter x:Key="PathToBitmap"/>
         <conv:BoolToPinTextConverter x:Key="BoolToPinText"/>
+        <conv:BoolToFontWeightConverter x:Key="BoolToFontWeight"/>
+        <conv:BoolToFontStyleConverter x:Key="BoolToFontStyle"/>
+        <conv:StringToTextAlignmentConverter x:Key="StringToTextAlignment"/>
+        <conv:StringToFontFamilyConverter x:Key="StringToFontFamily"/>
     </Window.Resources>
 
     <Grid ColumnDefinitions="280,*" Name="RootGrid">
@@ -35,15 +39,14 @@
                         <DataTemplate DataType="vm:NoteListItemViewModel">
                             <StackPanel Spacing="2" Margin="0,4">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="{Binding PinText}" 
-                                               FontSize="14" 
+                                    <TextBlock Text="{Binding PinText}"
+                                               FontSize="14"
                                                IsVisible="{Binding IsPinned}"/>
                                     <TextBlock Text="{Binding Title}"
                                                FontWeight="SemiBold"
                                                TextTrimming="CharacterEllipsis"
                                                FontSize="15"/>
                                 </StackPanel>
-
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <TextBlock Text="{Binding UpdatedAtDisplay}"
                                                FontSize="12"
@@ -69,14 +72,70 @@
                     <Button Content="Удалить" Command="{Binding NoteEditor.DeleteCommand}"/>
                     <Button Command="{Binding NoteEditor.TogglePinCommand}"
                             Content="{Binding NoteEditor.IsPinned, Converter={StaticResource BoolToPinText}}"/>
-                    <Button Content="Прикрепить фото" Command="{Binding NoteEditor.AttachImageCommand}"/>
+                    <Button Content="Прикрепить" Command="{Binding NoteEditor.AttachImageCommand}"/>
                 </StackPanel>
+
+                <Border DockPanel.Dock="Top"
+                        Background="#FAFAFA"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="8,6"
+                        Margin="0,8,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+
+                        <ComboBox Width="160"
+                                  ItemsSource="{Binding NoteEditor.AvailableFonts}"
+                                  SelectedItem="{Binding NoteEditor.FontFamily, Mode=TwoWay}"
+                                  ToolTip.Tip="Шрифт"/>
+
+                        <ComboBox Width="70"
+                                  ItemsSource="{Binding NoteEditor.AvailableFontSizes}"
+                                  SelectedItem="{Binding NoteEditor.FontSize, Mode=TwoWay}"
+                                  ToolTip.Tip="Размер"/>
+
+                        <Border Width="1" Background="#DDD" Margin="4,0"/>
+
+                        <ToggleButton IsChecked="{Binding NoteEditor.IsBold, Mode=TwoWay}"
+                                      ToolTip.Tip="Жирный"
+                                      HorizontalContentAlignment="Center"
+                                      MinWidth="36">
+                            <TextBlock Text="B" FontWeight="Bold"/>
+                        </ToggleButton>
+                        <ToggleButton IsChecked="{Binding NoteEditor.IsItalic, Mode=TwoWay}"
+                                      ToolTip.Tip="Курсив"
+                                      HorizontalContentAlignment="Center"
+                                      MinWidth="36">
+                            <TextBlock Text="I" FontStyle="Italic"/>
+                        </ToggleButton>
+
+                        <Border Width="1" Background="#DDD" Margin="4,0"/>
+
+                        <Button Command="{Binding NoteEditor.AlignLeftCommand}"
+                                ToolTip.Tip="По левому краю"
+                                HorizontalContentAlignment="Center"
+                                MinWidth="36"
+                                Content="⇤"/>
+                        <Button Command="{Binding NoteEditor.AlignCenterCommand}"
+                                ToolTip.Tip="По центру"
+                                MinWidth="36"
+                                HorizontalContentAlignment="Center"
+                                Content="⏏︎"/>
+                        <Button Command="{Binding NoteEditor.AlignRightCommand}"
+                                ToolTip.Tip="По правому краю"
+                                HorizontalContentAlignment="Center"
+                                MinWidth="36"
+                                Content="⇥"/>
+                    </StackPanel>
+                </Border>
 
                 <TextBox DockPanel.Dock="Top"
                          Text="{Binding NoteEditor.Title, Mode=TwoWay}"
-                         FontSize="20" FontWeight="Bold"
+                         FontSize="22" FontWeight="Bold"
                          PlaceholderText="Заголовок"
-                         Margin="0,12,0,8"/>
+                         Margin="0,12,0,8"
+                         BorderThickness="0"
+                         Background="Transparent"/>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="12">
@@ -127,6 +186,10 @@
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
                                  FontSize="{Binding NoteEditor.FontSize}"
+                                 FontFamily="{Binding NoteEditor.FontFamily, Converter={StaticResource StringToFontFamily}}"
+                                 FontWeight="{Binding NoteEditor.IsBold, Converter={StaticResource BoolToFontWeight}}"
+                                 FontStyle="{Binding NoteEditor.IsItalic, Converter={StaticResource BoolToFontStyle}}"
+                                 TextAlignment="{Binding NoteEditor.TextAlignment, Converter={StaticResource StringToTextAlignment}}"
                                  PlaceholderText="Начните писать..."
                                  MinHeight="200"
                                  BorderThickness="0"

@@ -26,8 +26,8 @@ public static class ServiceCollectionExtensions
             contextLifetime: ServiceLifetime.Transient,
             optionsLifetime: ServiceLifetime.Singleton);
 
-services.AddTransient<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
-        services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+        services.AddTransient<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+
         services.AddSingleton<IClock, SystemClock>();
         services.AddSingleton<IFileStorageService>(_ => new FileStorageService());
         services.AddTransient<INoteRepository, NoteRepository>();

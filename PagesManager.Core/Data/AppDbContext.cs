@@ -22,6 +22,7 @@ public class AppDbContext : DbContext, IAppDbContext
             entity.Property(n => n.Title).HasMaxLength(255).IsRequired();
             entity.Property(n => n.Content).IsRequired();
             entity.Property(n => n.FontFamily).HasMaxLength(100);
+            entity.Property(n => n.TextAlignment).HasMaxLength(20);
 
             entity.HasMany(n => n.Attachments)
                   .WithOne(a => a.Note!)

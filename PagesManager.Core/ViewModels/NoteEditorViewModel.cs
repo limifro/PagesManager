@@ -29,10 +29,33 @@ public partial class NoteEditorViewModel : ViewModelBase
     [ObservableProperty] private string _content = string.Empty;
     [ObservableProperty] private double _fontSize = 14;
     [ObservableProperty] private string _fontFamily = "Inter";
+    [ObservableProperty] private bool _isBold;
+    [ObservableProperty] private bool _isItalic;
+    [ObservableProperty] private bool _isUnderline;
+    [ObservableProperty] private string _textAlignment = "Left";
     [ObservableProperty] private bool _hasNote;
     [ObservableProperty] private bool _isPinned;
 
     public ObservableCollection<AttachmentViewModel> Attachments { get; } = new();
+
+    public IReadOnlyList<string> AvailableFonts { get; } = new[]
+    {
+    "Inter",
+    "Helvetica Neue",
+    "Helvetica",
+    "Arial",
+    "Times New Roman",
+    "Georgia",
+    "Menlo",
+    "Monaco",
+    "Courier New",
+    "Verdana"
+    };
+
+    public IReadOnlyList<double> AvailableFontSizes { get; } = new double[]
+    {
+        10, 12, 14, 16, 18, 20, 24, 28, 32
+    };
 
     public NoteEditorViewModel(
         INoteService noteService,
@@ -60,8 +83,12 @@ public partial class NoteEditorViewModel : ViewModelBase
 
         Title = note.Title;
         Content = note.Content;
-        FontSize = note.FontSize;
-        FontFamily = note.FontFamily;
+        FontSize = note.FontSize <= 0 ? 14 : note.FontSize;
+        FontFamily = string.IsNullOrWhiteSpace(note.FontFamily) ? "Inter" : note.FontFamily;
+        IsBold = note.IsBold;
+        IsItalic = note.IsItalic;
+        IsUnderline = note.IsUnderline;
+        TextAlignment = string.IsNullOrWhiteSpace(note.TextAlignment) ? "Left" : note.TextAlignment;
         IsPinned = note.IsPinned;
         HasNote = true;
 
@@ -80,6 +107,10 @@ public partial class NoteEditorViewModel : ViewModelBase
         Content = string.Empty;
         FontSize = 14;
         FontFamily = "Inter";
+        IsBold = false;
+        IsItalic = false;
+        IsUnderline = false;
+        TextAlignment = "Left";
         IsPinned = false;
         HasNote = false;
         Attachments.Clear();
@@ -108,6 +139,10 @@ public partial class NoteEditorViewModel : ViewModelBase
         _currentNote.Content = Content ?? string.Empty;
         _currentNote.FontSize = FontSize;
         _currentNote.FontFamily = FontFamily;
+        _currentNote.IsBold = IsBold;
+        _currentNote.IsItalic = IsItalic;
+        _currentNote.IsUnderline = IsUnderline;
+        _currentNote.TextAlignment = TextAlignment;
 
         await _noteService.UpdateAsync(_currentNote);
 
@@ -160,6 +195,14 @@ public partial class NoteEditorViewModel : ViewModelBase
         IsPinned = refreshed.IsPinned;
         _messenger.Send(new NoteSavedMessage(refreshed));
     }
+
+    [RelayCommand] private void ToggleBold() => IsBold = !IsBold;
+    [RelayCommand] private void ToggleItalic() => IsItalic = !IsItalic;
+    [RelayCommand] private void ToggleUnderline() => IsUnderline = !IsUnderline;
+
+    [RelayCommand] private void AlignLeft() => TextAlignment = "Left";
+    [RelayCommand] private void AlignCenter() => TextAlignment = "Center";
+    [RelayCommand] private void AlignRight() => TextAlignment = "Right";
 
     [RelayCommand]
     private async Task AttachImageAsync()
