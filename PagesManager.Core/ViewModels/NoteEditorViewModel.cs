@@ -30,6 +30,7 @@ public partial class NoteEditorViewModel : ViewModelBase
     [ObservableProperty] private double _fontSize = 14;
     [ObservableProperty] private string _fontFamily = "Inter";
     [ObservableProperty] private bool _hasNote;
+    [ObservableProperty] private bool _isPinned;
 
     public ObservableCollection<AttachmentViewModel> Attachments { get; } = new();
 
@@ -61,6 +62,7 @@ public partial class NoteEditorViewModel : ViewModelBase
         Content = note.Content;
         FontSize = note.FontSize;
         FontFamily = note.FontFamily;
+        IsPinned = note.IsPinned;
         HasNote = true;
 
         Attachments.Clear();
@@ -78,6 +80,7 @@ public partial class NoteEditorViewModel : ViewModelBase
         Content = string.Empty;
         FontSize = 14;
         FontFamily = "Inter";
+        IsPinned = false;
         HasNote = false;
         Attachments.Clear();
     }
@@ -149,8 +152,13 @@ public partial class NoteEditorViewModel : ViewModelBase
         if (_currentNote is null) return;
 
         await _noteService.TogglePinAsync(_currentNote.Id);
-        _currentNote.IsPinned = !_currentNote.IsPinned;
-        _messenger.Send(new NoteSavedMessage(_currentNote));
+
+        var refreshed = await _noteService.GetByIdAsync(_currentNote.Id);
+        if (refreshed is null) return;
+
+        _currentNote = refreshed;
+        IsPinned = refreshed.IsPinned;
+        _messenger.Send(new NoteSavedMessage(refreshed));
     }
 
     [RelayCommand]

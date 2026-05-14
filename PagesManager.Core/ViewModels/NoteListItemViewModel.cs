@@ -1,11 +1,14 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using PagesManager.Core.Helpers;
 using PagesManager.Core.Models;
 
 namespace PagesManager.Core.ViewModels;
 
 public partial class NoteListItemViewModel : ViewModelBase
 {
+    private readonly IClock _clock;
+
     public Note Model { get; set; }
 
     [ObservableProperty]
@@ -18,29 +21,38 @@ public partial class NoteListItemViewModel : ViewModelBase
     private DateTime _updatedAt;
 
     [ObservableProperty]
+    private string _updatedAtDisplay;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PinText))]
     private bool _isPinned;
 
-    public NoteListItemViewModel(Note note)
+    public string PinText => IsPinned ? "📌 " : string.Empty;
+
+    public NoteListItemViewModel(Note note, IClock? clock = null)
     {
+        _clock = clock ?? new SystemClock();
         Model = note;
-        _title = note.Title;
+        _title = string.IsNullOrWhiteSpace(note.Title) ? "Без названия" : note.Title;
         _preview = BuildPreview(note.Content);
         _updatedAt = note.UpdatedAt;
+        _updatedAtDisplay = DateFormatter.FormatRelative(note.UpdatedAt, _clock.UtcNow);
         _isPinned = note.IsPinned;
     }
 
     public void Refresh()
     {
-        Title = Model.Title;
+        Title = string.IsNullOrWhiteSpace(Model.Title) ? "Без названия" : Model.Title;
         Preview = BuildPreview(Model.Content);
         UpdatedAt = Model.UpdatedAt;
+        UpdatedAtDisplay = DateFormatter.FormatRelative(Model.UpdatedAt, _clock.UtcNow);
         IsPinned = Model.IsPinned;
     }
 
     private static string BuildPreview(string content)
     {
-        if (string.IsNullOrWhiteSpace(content)) return string.Empty;
+        if (string.IsNullOrWhiteSpace(content)) return "Нет дополнительного текста";
         var trimmed = content.Trim().Replace("\r", " ").Replace("\n", " ");
-        return trimmed.Length > 80 ? trimmed[..80] + "…" : trimmed;
+        return trimmed.Length > 60 ? trimmed[..60] + "…" : trimmed;
     }
 }
