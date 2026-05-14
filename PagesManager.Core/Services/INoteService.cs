@@ -17,5 +17,8 @@ public interface INoteService
     Task TogglePinAsync(int id, CancellationToken ct = default);
 
     Task<Attachment> AttachFileAsync(int noteId, Stream stream, string originalFileName, string contentType, CancellationToken ct = default);
+
+    Task<Attachment> AddExistingAttachmentAsync(int noteId, string filePath, string fileName, string contentType, CancellationToken ct = default);
+
     Task RemoveAttachmentAsync(int attachmentId, CancellationToken ct = default);
 }

@@ -63,7 +63,6 @@ public class NoteService : INoteService
         var note = await _repository.GetByIdAsync(id, ct);
         if (note is null) return;
 
-        // Удаляем файлы вложений с диска
         foreach (var att in note.Attachments)
             _fileStorage.Delete(att.FilePath);
 
@@ -104,6 +103,37 @@ public class NoteService : INoteService
         _db.Attachments.Add(attachment);
         note.UpdatedAt = _clock.UtcNow;
         await _db.SaveChangesAsync(ct);
+
+        return attachment;
+    }
+
+    public async Task<Attachment> AddExistingAttachmentAsync(
+        int noteId,
+        string filePath,
+        string fileName,
+        string contentType,
+        CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("File path is required", nameof(filePath));
+
+        var note = await _repository.GetByIdAsync(noteId, ct)
+                   ?? throw new InvalidOperationException($"Note {noteId} not found");
+
+        var attachment = new Attachment
+        {
+            NoteId = noteId,
+            FilePath = filePath,
+            FileName = fileName ?? string.Empty,
+            ContentType = contentType ?? string.Empty,
+            AddedAt = _clock.UtcNow
+        };
+
+        _db.Attachments.Add(attachment);
+        await _db.SaveChangesAsync(ct);
+
+        note.UpdatedAt = _clock.UtcNow;
+        await _repository.UpdateAsync(note, ct);
 
         return attachment;
     }

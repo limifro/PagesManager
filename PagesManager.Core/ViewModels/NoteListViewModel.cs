@@ -93,14 +93,23 @@ public partial class NoteListViewModel : ViewModelBase
     }
 
     private void OnNoteSaved(NoteSavedMessage m)
+{
+    var existing = Notes.FirstOrDefault(n => n.Model.Id == m.Note.Id);
+
+    if (existing is not null)
     {
-        var existing = Notes.FirstOrDefault(n => n.Model.Id == m.Note.Id);
-        if (existing is not null)
+        existing.Model = m.Note;
+
+        existing.Refresh();
+
+        ResortNotes();
+
+        if (SelectedNote == existing)
         {
-            existing.Refresh();
-            ResortNotes();
+            OnSelectedNoteChanged(existing);
         }
     }
+}
 
     private void OnNoteDeleted(NoteDeletedMessage m)
     {

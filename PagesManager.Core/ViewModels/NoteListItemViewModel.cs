@@ -6,7 +6,7 @@ namespace PagesManager.Core.ViewModels;
 
 public partial class NoteListItemViewModel : ViewModelBase
 {
-    public Note Model { get; }
+    public Note Model { get; set; }
 
     [ObservableProperty]
     private string _title;

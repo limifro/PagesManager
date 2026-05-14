@@ -17,26 +17,19 @@ public partial class NoteEditorViewModel : ViewModelBase
     private readonly INoteService _noteService;
     private readonly IFilePickerService _filePicker;
     private readonly IImagePreviewService _imagePreviewService;
+    private readonly IFileStorageService _fileStorage;
     private readonly IMessenger _messenger;
 
     private Note? _currentNote;
 
     private readonly HashSet<int> _pendingDeletedAttachmentIds = new();
+    private readonly List<PendingAttachment> _pendingAddedAttachments = new();
 
-    [ObservableProperty]
-    private string _title = string.Empty;
-
-    [ObservableProperty]
-    private string _content = string.Empty;
-
-    [ObservableProperty]
-    private double _fontSize = 14;
-
-    [ObservableProperty]
-    private string _fontFamily = "Inter";
-
-    [ObservableProperty]
-    private bool _hasNote;
+    [ObservableProperty] private string _title = string.Empty;
+    [ObservableProperty] private string _content = string.Empty;
+    [ObservableProperty] private double _fontSize = 14;
+    [ObservableProperty] private string _fontFamily = "Inter";
+    [ObservableProperty] private bool _hasNote;
 
     public ObservableCollection<AttachmentViewModel> Attachments { get; } = new();
 
@@ -44,11 +37,13 @@ public partial class NoteEditorViewModel : ViewModelBase
         INoteService noteService,
         IFilePickerService filePicker,
         IImagePreviewService imagePreviewService,
+        IFileStorageService fileStorage,
         IMessenger messenger)
     {
         _noteService = noteService;
         _filePicker = filePicker;
         _imagePreviewService = imagePreviewService;
+        _fileStorage = fileStorage;
         _messenger = messenger;
     }
 
@@ -56,8 +51,11 @@ public partial class NoteEditorViewModel : ViewModelBase
 
     public void Load(Note note)
     {
-        _currentNote = note ?? throw new ArgumentNullException(nameof(note));
-        _pendingDeletedAttachmentIds.Clear();
+        if (note is null) throw new ArgumentNullException(nameof(note));
+
+        DiscardPendingChanges();
+
+        _currentNote = note;
 
         Title = note.Title;
         Content = note.Content;
@@ -72,8 +70,9 @@ public partial class NoteEditorViewModel : ViewModelBase
 
     public void Clear()
     {
+        DiscardPendingChanges();
+
         _currentNote = null;
-        _pendingDeletedAttachmentIds.Clear();
 
         Title = string.Empty;
         Content = string.Empty;
@@ -81,6 +80,20 @@ public partial class NoteEditorViewModel : ViewModelBase
         FontFamily = "Inter";
         HasNote = false;
         Attachments.Clear();
+    }
+
+    private void DiscardPendingChanges()
+    {
+        foreach (var pending in _pendingAddedAttachments)
+        {
+            try { _fileStorage.Delete(pending.FilePath); }
+            catch
+            {
+                
+            }
+        }
+        _pendingAddedAttachments.Clear();
+        _pendingDeletedAttachmentIds.Clear();
     }
 
     [RelayCommand]
@@ -96,9 +109,18 @@ public partial class NoteEditorViewModel : ViewModelBase
         await _noteService.UpdateAsync(_currentNote);
 
         foreach (var attachmentId in _pendingDeletedAttachmentIds.ToList())
-        {
             await _noteService.RemoveAttachmentAsync(attachmentId);
+        _pendingDeletedAttachmentIds.Clear();
+
+        foreach (var pending in _pendingAddedAttachments.ToList())
+        {
+            await _noteService.AddExistingAttachmentAsync(
+                _currentNote.Id,
+                pending.FilePath,
+                pending.FileName,
+                pending.ContentType);
         }
+        _pendingAddedAttachments.Clear();
 
         var refreshed = await _noteService.GetByIdAsync(_currentNote.Id);
         if (refreshed is not null)
@@ -106,16 +128,14 @@ public partial class NoteEditorViewModel : ViewModelBase
             Load(refreshed);
             _messenger.Send(new NoteSavedMessage(refreshed));
         }
-        else
-        {
-            _pendingDeletedAttachmentIds.Clear();
-        }
     }
 
     [RelayCommand]
     private async Task DeleteAsync()
     {
         if (_currentNote is null) return;
+
+        DiscardPendingChanges();
 
         var id = _currentNote.Id;
         await _noteService.DeleteAsync(id);
@@ -144,17 +164,24 @@ public partial class NoteEditorViewModel : ViewModelBase
         foreach (var file in picked)
         {
             await using var stream = file.OpenRead;
-            var attachment = await _noteService.AttachFileAsync(
-                _currentNote.Id,
-                stream,
-                file.FileName,
-                file.ContentType);
 
-            _currentNote.Attachments.Add(attachment);
-            Attachments.Add(new AttachmentViewModel(attachment));
+            var savedPath = await _fileStorage.SaveAsync(stream, file.FileName);
+
+            var pendingModel = new Attachment
+            {
+                Id = 0,
+                NoteId = _currentNote.Id,
+                FilePath = savedPath,
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+                AddedAt = DateTime.UtcNow
+            };
+
+            var vm = new AttachmentViewModel(pendingModel);
+            Attachments.Add(vm);
+            _pendingAddedAttachments.Add(new PendingAttachment(
+                savedPath, file.FileName, file.ContentType, vm));
         }
-
-        _messenger.Send(new NoteSavedMessage(_currentNote));
     }
 
     [RelayCommand]
@@ -163,9 +190,22 @@ public partial class NoteEditorViewModel : ViewModelBase
         if (attachment is null || _currentNote is null)
             return Task.CompletedTask;
 
+        var pending = _pendingAddedAttachments.FirstOrDefault(p => p.ViewModel == attachment);
+        if (pending is not null)
+        {
+            try { _fileStorage.Delete(pending.FilePath); }
+            catch
+            {
+                
+            }
+
+            _pendingAddedAttachments.Remove(pending);
+            Attachments.Remove(attachment);
+            return Task.CompletedTask;
+        }
+
         _pendingDeletedAttachmentIds.Add(attachment.Id);
         Attachments.Remove(attachment);
-
         return Task.CompletedTask;
     }
 
@@ -173,7 +213,12 @@ public partial class NoteEditorViewModel : ViewModelBase
     private async Task OpenAttachmentPreviewAsync(AttachmentViewModel? attachment)
     {
         if (attachment is null) return;
-
         await _imagePreviewService.ShowAsync(attachment.FilePath, attachment.FileName);
     }
+
+    private sealed record PendingAttachment(
+        string FilePath,
+        string FileName,
+        string ContentType,
+        AttachmentViewModel ViewModel);
 }
