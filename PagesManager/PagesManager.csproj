@@ -28,4 +28,9 @@
   <ItemGroup>
     <ProjectReference Include="..\PagesManager.Core\PagesManager.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+      <AvaloniaResource Include="Styles/**/*.axaml"/>
+  </ItemGroup>
+
 </Project>

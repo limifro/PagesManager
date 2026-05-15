@@ -8,7 +8,9 @@
         x:Class="PagesManager.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Width="1100" Height="700"
-        Title="Pages Manager">
+        MinWidth="800" MinHeight="500"
+        Title="Pages Manager"
+        Background="White">
 
     <Window.Resources>
         <conv:PathToBitmapConverter x:Key="PathToBitmap"/>
@@ -19,42 +21,53 @@
         <conv:StringToFontFamilyConverter x:Key="StringToFontFamily"/>
     </Window.Resources>
 
-    <Grid ColumnDefinitions="280,*" Name="RootGrid">
+    <Grid ColumnDefinitions="300,*" Name="RootGrid">
 
-        <Border Grid.Column="0" Background="#F4F4F6" Padding="8">
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Spacing="6">
-                    <TextBlock Text="Заметки" FontSize="20" FontWeight="Bold"/>
-                    <Button Content="+ Новая заметка"
-                            Command="{Binding NoteList.CreateNoteCommand}"
-                            HorizontalAlignment="Stretch"/>
-                    <TextBox PlaceholderText="Поиск..."
-                             Text="{Binding NoteList.SearchQuery, Mode=TwoWay}"/>
-                </StackPanel>
-
+        <Border Grid.Column="0"
+                Background="{DynamicResource SidebarBackground}"
+                BorderBrush="{DynamicResource DividerColor}"
+                BorderThickness="0,0,1,0">
+            <DockPanel Margin="12">
+                <TextBlock DockPanel.Dock="Top"
+                           Text="Заметки"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="{DynamicResource PrimaryText}"
+                           Margin="4,4,4,12"/>
+                <Button DockPanel.Dock="Top"
+                        Classes="accent"
+                        Content="＋  Новая заметка"
+                        Command="{Binding NoteList.CreateNoteCommand}"
+                        HorizontalAlignment="Stretch"
+                        Margin="0,0,0,10"/>
+                <TextBox DockPanel.Dock="Top"
+                         Classes="search"
+                         PlaceholderText="Поиск..."
+                         Text="{Binding NoteList.SearchQuery, Mode=TwoWay}"
+                         Margin="0,0,0,10"/>
                 <ListBox ItemsSource="{Binding NoteList.Notes}"
-                         SelectedItem="{Binding NoteList.SelectedNote, Mode=TwoWay}"
-                         Margin="0,8,0,0">
+                         SelectedItem="{Binding NoteList.SelectedNote, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="vm:NoteListItemViewModel">
-                            <StackPanel Spacing="2" Margin="0,4">
+                            <StackPanel Spacing="3">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBlock Text="{Binding PinText}"
-                                               FontSize="14"
+                                               FontSize="12"
                                                IsVisible="{Binding IsPinned}"/>
                                     <TextBlock Text="{Binding Title}"
                                                FontWeight="SemiBold"
                                                TextTrimming="CharacterEllipsis"
-                                               FontSize="15"/>
+                                               FontSize="14"
+                                               Foreground="{DynamicResource PrimaryText}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <TextBlock Text="{Binding UpdatedAtDisplay}"
                                                FontSize="12"
                                                FontWeight="SemiBold"
-                                               Foreground="#444"/>
+                                               Foreground="{DynamicResource PrimaryText}"/>
                                     <TextBlock Text="{Binding Preview}"
                                                FontSize="12"
-                                               Foreground="Gray"
+                                               Foreground="{DynamicResource SecondaryText}"
                                                TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                             </StackPanel>
@@ -64,82 +77,94 @@
             </DockPanel>
         </Border>
 
-        <Border Grid.Column="1" Padding="16">
-            <DockPanel IsVisible="{Binding NoteEditor.HasNote}">
+        <Grid Grid.Column="1" Background="{DynamicResource EditorBackground}">
 
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8">
-                    <Button Content="Сохранить" Command="{Binding NoteEditor.SaveCommand}"/>
-                    <Button Content="Удалить" Command="{Binding NoteEditor.DeleteCommand}"/>
-                    <Button Command="{Binding NoteEditor.TogglePinCommand}"
-                            Content="{Binding NoteEditor.IsPinned, Converter={StaticResource BoolToPinText}}"/>
-                    <Button Content="Прикрепить" Command="{Binding NoteEditor.AttachImageCommand}"/>
-                </StackPanel>
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="8"
+                        IsVisible="{Binding !NoteEditor.HasNote}">
+                <TextBlock Text="📝"
+                           FontSize="64"
+                           HorizontalAlignment="Center"
+                           Opacity="0.3"/>
+                <TextBlock Text="Выберите заметку"
+                           FontSize="18"
+                           Foreground="{DynamicResource SecondaryText}"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="или создайте новую"
+                           FontSize="13"
+                           Foreground="{DynamicResource SecondaryText}"
+                           HorizontalAlignment="Center"
+                           Opacity="0.7"/>
+            </StackPanel>
+
+            <DockPanel IsVisible="{Binding NoteEditor.HasNote}" Margin="32,20">
 
                 <Border DockPanel.Dock="Top"
-                        Background="#FAFAFA"
-                        BorderBrush="#E0E0E0"
-                        BorderThickness="1"
-                        CornerRadius="6"
-                        Padding="8,6"
-                        Margin="0,8,0,0">
-                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        BorderBrush="{DynamicResource DividerColor}"
+                        BorderThickness="0,0,0,1"
+                        Padding="0,0,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Button Content="Сохранить"
+                                Command="{Binding NoteEditor.SaveCommand}"/>
+                        <Button Content="Удалить"
+                                Command="{Binding NoteEditor.DeleteCommand}"/>
+                        <Button Command="{Binding NoteEditor.TogglePinCommand}"
+                                Content="{Binding NoteEditor.IsPinned, Converter={StaticResource BoolToPinText}}"/>
+                        <Button Content="Прикрепить фото"
+                                Command="{Binding NoteEditor.AttachImageCommand}"/>
+                    </StackPanel>
+                </Border>
 
+                <Border DockPanel.Dock="Top"
+                        Background="{DynamicResource ToolbarBackground}"
+                        BorderBrush="{DynamicResource ToolbarBorder}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="10,6"
+                        Margin="0,12,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
                         <ComboBox Width="160"
                                   ItemsSource="{Binding NoteEditor.AvailableFonts}"
                                   SelectedItem="{Binding NoteEditor.FontFamily, Mode=TwoWay}"
                                   ToolTip.Tip="Шрифт"/>
-
                         <ComboBox Width="70"
                                   ItemsSource="{Binding NoteEditor.AvailableFontSizes}"
                                   SelectedItem="{Binding NoteEditor.FontSize, Mode=TwoWay}"
                                   ToolTip.Tip="Размер"/>
-
-                        <Border Width="1" Background="#DDD" Margin="4,0"/>
-
+                        <Border Width="1" Background="{DynamicResource DividerColor}" Margin="6,2"/>
                         <ToggleButton IsChecked="{Binding NoteEditor.IsBold, Mode=TwoWay}"
-                                      ToolTip.Tip="Жирный"
-                                      HorizontalContentAlignment="Center"
-                                      MinWidth="36">
-                            <TextBlock Text="B" FontWeight="Bold"/>
+                                      ToolTip.Tip="Жирный">
+                            <TextBlock Text="B" FontWeight="Bold" FontSize="14"/>
                         </ToggleButton>
                         <ToggleButton IsChecked="{Binding NoteEditor.IsItalic, Mode=TwoWay}"
-                                      ToolTip.Tip="Курсив"
-                                      HorizontalContentAlignment="Center"
-                                      MinWidth="36">
-                            <TextBlock Text="I" FontStyle="Italic"/>
+                                      ToolTip.Tip="Курсив">
+                            <TextBlock Text="I" FontStyle="Italic" FontSize="14"/>
                         </ToggleButton>
-
-                        <Border Width="1" Background="#DDD" Margin="4,0"/>
-
-                        <Button Command="{Binding NoteEditor.AlignLeftCommand}"
+                        <Border Width="1" Background="{DynamicResource DividerColor}" Margin="6,2"/>
+                        <Button Classes="toolbar"
+                                Command="{Binding NoteEditor.AlignLeftCommand}"
                                 ToolTip.Tip="По левому краю"
-                                HorizontalContentAlignment="Center"
-                                MinWidth="36"
-                                Content="⇤"/>
-                        <Button Command="{Binding NoteEditor.AlignCenterCommand}"
+                                Content="⬅"/>
+                        <Button Classes="toolbar"
+                                Command="{Binding NoteEditor.AlignCenterCommand}"
                                 ToolTip.Tip="По центру"
-                                MinWidth="36"
-                                HorizontalContentAlignment="Center"
-                                Content="⏏︎"/>
-                        <Button Command="{Binding NoteEditor.AlignRightCommand}"
+                                Content="⬌"/>
+                        <Button Classes="toolbar"
+                                Command="{Binding NoteEditor.AlignRightCommand}"
                                 ToolTip.Tip="По правому краю"
-                                HorizontalContentAlignment="Center"
-                                MinWidth="36"
-                                Content="⇥"/>
+                                Content="➡"/>
                     </StackPanel>
                 </Border>
 
                 <TextBox DockPanel.Dock="Top"
+                         Classes="title"
                          Text="{Binding NoteEditor.Title, Mode=TwoWay}"
-                         FontSize="22" FontWeight="Bold"
                          PlaceholderText="Заголовок"
-                         Margin="0,12,0,8"
-                         BorderThickness="0"
-                         Background="Transparent"/>
+                         Margin="0,18,0,4"/>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="12">
-
+                    <StackPanel Spacing="14" Margin="0,8,0,16">
                         <ItemsControl ItemsSource="{Binding NoteEditor.Attachments}"
                                       IsVisible="{Binding NoteEditor.Attachments.Count}">
                             <ItemsControl.ItemsPanel>
@@ -149,22 +174,22 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:AttachmentViewModel">
-                                    <Border Margin="0,0,8,8"
-                                            CornerRadius="8"
+                                    <Border Margin="0,0,10,10"
+                                            CornerRadius="10"
                                             ClipToBounds="True"
-                                            BorderBrush="#E0E0E0"
-                                            BorderThickness="1">
+                                            BorderBrush="{DynamicResource DividerColor}"
+                                            BorderThickness="1"
+                                            Background="#FAFAFA">
                                         <Grid Width="180" Height="180">
-
                                             <Button Background="Transparent"
                                                     BorderThickness="0"
                                                     Padding="0"
+                                                    CornerRadius="0"
                                                     Command="{Binding #RootGrid.((vm:MainWindowViewModel)DataContext).NoteEditor.OpenAttachmentPreviewCommand}"
                                                     CommandParameter="{Binding}">
                                                 <Image Source="{Binding FilePath, Converter={StaticResource PathToBitmap}}"
                                                        Stretch="UniformToFill"/>
                                             </Button>
-
                                             <Button Content="✕"
                                                     HorizontalAlignment="Right"
                                                     VerticalAlignment="Top"
@@ -173,6 +198,9 @@
                                                     Background="#AA000000"
                                                     Foreground="White"
                                                     BorderThickness="0"
+                                                    CornerRadius="12"
+                                                    FontSize="11"
+                                                    FontWeight="Bold"
                                                     Command="{Binding #RootGrid.((vm:MainWindowViewModel)DataContext).NoteEditor.RemoveAttachmentCommand}"
                                                     CommandParameter="{Binding}"
                                                     ZIndex="1"/>
@@ -182,7 +210,8 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBox Text="{Binding NoteEditor.Content, Mode=TwoWay}"
+                        <TextBox Classes="content"
+                                 Text="{Binding NoteEditor.Content, Mode=TwoWay}"
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
                                  FontSize="{Binding NoteEditor.FontSize}"
@@ -191,13 +220,11 @@
                                  FontStyle="{Binding NoteEditor.IsItalic, Converter={StaticResource BoolToFontStyle}}"
                                  TextAlignment="{Binding NoteEditor.TextAlignment, Converter={StaticResource StringToTextAlignment}}"
                                  PlaceholderText="Начните писать..."
-                                 MinHeight="200"
-                                 BorderThickness="0"
-                                 Background="Transparent"/>
+                                 MinHeight="300"/>
                     </StackPanel>
                 </ScrollViewer>
 
             </DockPanel>
-        </Border>
+        </Grid>
     </Grid>
 </Window>
