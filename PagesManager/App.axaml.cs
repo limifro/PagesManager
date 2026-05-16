@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using PagesManager.Core.Services;
 using PagesManager.Core.ViewModels;
 using PagesManager.Views;
 
@@ -19,6 +20,10 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
             && Program.AppHost is not null)
         {
+            var themeService = Program.AppHost.Services.GetRequiredService<IThemeService>();
+            var savedTheme = themeService.LoadSavedTheme();
+            themeService.SetTheme(savedTheme);
+
             var vm = Program.AppHost.Services.GetRequiredService<MainWindowViewModel>();
 
             desktop.MainWindow = new MainWindow

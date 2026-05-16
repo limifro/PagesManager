@@ -2,15 +2,39 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Styles.Resources>
-        <SolidColorBrush x:Key="SidebarBackground" Color="#FBF7E8"/>
-        <SolidColorBrush x:Key="EditorBackground" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="AccentColor" Color="#E5A93D"/>
-        <SolidColorBrush x:Key="AccentColorLight" Color="#F5E6B8"/>
-        <SolidColorBrush x:Key="PrimaryText" Color="#1C1C1E"/>
-        <SolidColorBrush x:Key="SecondaryText" Color="#8A8A8E"/>
-        <SolidColorBrush x:Key="DividerColor" Color="#EFEAD8"/>
-        <SolidColorBrush x:Key="ToolbarBackground" Color="#FAFAFA"/>
-        <SolidColorBrush x:Key="ToolbarBorder" Color="#E8E8E8"/>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="SidebarBackground" Color="#FBF7E8"/>
+                    <SolidColorBrush x:Key="EditorBackground" Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="AccentColor" Color="#E5A93D"/>
+                    <SolidColorBrush x:Key="AccentColorLight" Color="#F5E6B8"/>
+                    <SolidColorBrush x:Key="PrimaryText" Color="#1C1C1E"/>
+                    <SolidColorBrush x:Key="SecondaryText" Color="#8A8A8E"/>
+                    <SolidColorBrush x:Key="DividerColor" Color="#EFEAD8"/>
+                    <SolidColorBrush x:Key="ToolbarBackground" Color="#FAFAFA"/>
+                    <SolidColorBrush x:Key="ToolbarBorder" Color="#E8E8E8"/>
+                    <SolidColorBrush x:Key="HoverBackground" Color="#F0EBD8"/>
+                    <SolidColorBrush x:Key="HoverBackgroundStrong" Color="#E8E0C5"/>
+                </ResourceDictionary>
+
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="SidebarBackground" Color="#2C2A26"/>
+                    <SolidColorBrush x:Key="EditorBackground" Color="#1E1E1E"/>
+                    <SolidColorBrush x:Key="AccentColor" Color="#E5A93D"/>
+                    <SolidColorBrush x:Key="AccentColorLight" Color="#4A3F1F"/>
+                    <SolidColorBrush x:Key="PrimaryText" Color="#F0F0F0"/>
+                    <SolidColorBrush x:Key="SecondaryText" Color="#9A9A9A"/>
+                    <SolidColorBrush x:Key="DividerColor" Color="#3A3631"/>
+                    <SolidColorBrush x:Key="ToolbarBackground" Color="#252320"/>
+                    <SolidColorBrush x:Key="ToolbarBorder" Color="#3A3631"/>
+                    <SolidColorBrush x:Key="HoverBackground" Color="#3A3631"/>
+                    <SolidColorBrush x:Key="HoverBackgroundStrong" Color="#454039"/>
+                </ResourceDictionary>
+
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
     </Styles.Resources>
 
     <Style Selector="Button">
@@ -18,7 +42,7 @@
         <Setter Property="CornerRadius" Value="6"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -26,22 +50,22 @@
     </Style>
 
     <Style Selector="Button:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#F0EBD8"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
     </Style>
 
     <Style Selector="Button:pressed /template/ ContentPresenter">
-        <Setter Property="Background" Value="#E8E0C5"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundStrong}"/>
     </Style>
 
     <Style Selector="Button.accent">
-        <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+        <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Padding" Value="12,8"/>
     </Style>
 
     <Style Selector="Button.accent /template/ ContentPresenter">
-        <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+        <Setter Property="Background" Value="{DynamicResource AccentColor}"/>
         <Setter Property="CornerRadius" Value="6"/>
     </Style>
 
@@ -65,7 +89,7 @@
         <Setter Property="CornerRadius" Value="6"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Cursor" Value="Hand"/>
@@ -73,21 +97,22 @@
     </Style>
 
     <Style Selector="ToggleButton:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#F0EBD8"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
     </Style>
 
     <Style Selector="ToggleButton:checked /template/ ContentPresenter">
-        <Setter Property="Background" Value="{StaticResource AccentColorLight}"/>
+        <Setter Property="Background" Value="{DynamicResource AccentColorLight}"/>
     </Style>
 
     <Style Selector="ToggleButton:checked:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#EBD894"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundStrong}"/>
     </Style>
 
     <Style Selector="TextBox">
         <Setter Property="CornerRadius" Value="6"/>
         <Setter Property="Padding" Value="8,6"/>
         <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryText}"/>
     </Style>
 
     <Style Selector="TextBox.title">
@@ -98,11 +123,18 @@
         <Setter Property="Padding" Value="8,6"/>
     </Style>
 
-    <Style Selector="TextBox.title:focus /template/ Border#PART_BorderElement">
+    <Style Selector="TextBox.title /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
     </Style>
 
     <Style Selector="TextBox.title:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style Selector="TextBox.title:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
     </Style>
 
@@ -112,17 +144,24 @@
         <Setter Property="Padding" Value="8,6"/>
     </Style>
 
-    <Style Selector="TextBox.content:focus /template/ Border#PART_BorderElement">
+    <Style Selector="TextBox.content /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
     </Style>
 
     <Style Selector="TextBox.content:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <Style Selector="TextBox.content:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderThickness" Value="0"/>
     </Style>
 
     <Style Selector="TextBox.search">
-        <Setter Property="Background" Value="#FFFFFF"/>
-        <Setter Property="BorderBrush" Value="{StaticResource DividerColor}"/>
+        <Setter Property="Background" Value="{DynamicResource EditorBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource DividerColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
@@ -147,19 +186,19 @@
     </Style>
 
     <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#F0EBD8"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackground}"/>
     </Style>
 
     <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-        <Setter Property="Background" Value="{StaticResource AccentColorLight}"/>
+        <Setter Property="Background" Value="{DynamicResource AccentColorLight}"/>
     </Style>
 
     <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
-        <Setter Property="Background" Value="#EBD894"/>
+        <Setter Property="Background" Value="{DynamicResource HoverBackgroundStrong}"/>
     </Style>
 
     <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
-        <Setter Property="Background" Value="{StaticResource AccentColorLight}"/>
+        <Setter Property="Background" Value="{DynamicResource AccentColorLight}"/>
     </Style>
 
 </Styles>

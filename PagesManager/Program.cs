@@ -26,6 +26,7 @@ internal class Program
 
         services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
         services.AddSingleton<IImagePreviewService, AvaloniaImagePreviewService>();
+        services.AddSingleton<IThemeService, AvaloniaThemeService>();
         })
         .Build();
 

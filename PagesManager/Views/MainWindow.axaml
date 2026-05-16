@@ -10,7 +10,7 @@
         Width="1100" Height="700"
         MinWidth="800" MinHeight="500"
         Title="Pages Manager"
-        Background="White">
+        Background="{DynamicResource EditorBackground}">
 
     <Window.Resources>
         <conv:PathToBitmapConverter x:Key="PathToBitmap"/>
@@ -19,6 +19,7 @@
         <conv:BoolToFontStyleConverter x:Key="BoolToFontStyle"/>
         <conv:StringToTextAlignmentConverter x:Key="StringToTextAlignment"/>
         <conv:StringToFontFamilyConverter x:Key="StringToFontFamily"/>
+        <conv:BoolToThemeIconConverter x:Key="BoolToThemeIcon"/>
     </Window.Resources>
 
     <Grid ColumnDefinitions="300,*" Name="RootGrid">
@@ -28,12 +29,23 @@
                 BorderBrush="{DynamicResource DividerColor}"
                 BorderThickness="0,0,1,0">
             <DockPanel Margin="12">
-                <TextBlock DockPanel.Dock="Top"
-                           Text="Заметки"
-                           FontSize="32"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource PrimaryText}"
-                           Margin="4,4,4,12"/>
+
+                <Grid DockPanel.Dock="Top" Margin="4,4,4,12" ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0"
+                               Text="Заметки"
+                               FontSize="32"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryText}"
+                               VerticalAlignment="Center"/>
+                    <Button Grid.Column="1"
+                            Command="{Binding ToggleThemeCommand}"
+                            ToolTip.Tip="Переключить тему"
+                            Padding="8,4"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Content="{Binding IsDarkTheme, Converter={StaticResource BoolToThemeIcon}}"/>
+                </Grid>
+
                 <Button DockPanel.Dock="Top"
                         Classes="accent"
                         Content="＋  Новая заметка"
@@ -179,7 +191,7 @@
                                             ClipToBounds="True"
                                             BorderBrush="{DynamicResource DividerColor}"
                                             BorderThickness="1"
-                                            Background="#FAFAFA">
+                                            Background="{DynamicResource ToolbarBackground}">
                                         <Grid Width="180" Height="180">
                                             <Button Background="Transparent"
                                                     BorderThickness="0"
