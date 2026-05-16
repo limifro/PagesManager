@@ -157,15 +157,15 @@
                         <Button Classes="toolbar"
                                 Command="{Binding NoteEditor.AlignLeftCommand}"
                                 ToolTip.Tip="По левому краю"
-                                Content="⬅"/>
+                                Content="←"/>
                         <Button Classes="toolbar"
                                 Command="{Binding NoteEditor.AlignCenterCommand}"
                                 ToolTip.Tip="По центру"
-                                Content="⬌"/>
+                                Content="⏏︎"/>
                         <Button Classes="toolbar"
                                 Command="{Binding NoteEditor.AlignRightCommand}"
                                 ToolTip.Tip="По правому краю"
-                                Content="➡"/>
+                                Content="→"/>
                     </StackPanel>
                 </Border>
 
