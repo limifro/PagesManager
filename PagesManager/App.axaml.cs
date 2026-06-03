@@ -18,13 +18,13 @@ public partial class App : Application
     public override async void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
-            && Program.AppHost is not null)
+            && Program.Services is not null)
         {
-            var themeService = Program.AppHost.Services.GetRequiredService<IThemeService>();
+            var themeService = Program.Services.GetRequiredService<IThemeService>();
             var savedTheme = themeService.LoadSavedTheme();
             themeService.SetTheme(savedTheme);
 
-            var vm = Program.AppHost.Services.GetRequiredService<MainWindowViewModel>();
+            var vm = Program.Services.GetRequiredService<MainWindowViewModel>();
 
             desktop.MainWindow = new MainWindow
             {

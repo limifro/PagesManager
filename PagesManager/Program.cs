@@ -2,7 +2,6 @@
 using Avalonia;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using PagesManager.Core;
 using PagesManager.Core.Data;
 using PagesManager.Core.Services;
@@ -12,25 +11,22 @@ namespace PagesManager;
 
 internal class Program
 {
-    public static IHost? AppHost { get; private set; }
+    public static IServiceProvider? Services { get; private set; }
 
     [STAThread]
     public static void Main(string[] args)
     {
-        AppHost = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((_, services) =>
-        {
-        services
-            .AddPagesManagerCore()
-            .AddPagesManagerViewModels();
+        var collection = new ServiceCollection();
 
-        services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
-        services.AddSingleton<IImagePreviewService, AvaloniaImagePreviewService>();
-        services.AddSingleton<IThemeService, AvaloniaThemeService>();
-        })
-        .Build();
+        collection.AddPagesManagerCore();
+        collection.AddPagesManagerViewModels();
+        collection.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
+        collection.AddSingleton<IImagePreviewService, AvaloniaImagePreviewService>();
+        collection.AddSingleton<IThemeService, AvaloniaThemeService>();
 
-        using (var scope = AppHost.Services.CreateScope())
+        Services = collection.BuildServiceProvider();
+
+        using (var scope = Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.Migrate();
