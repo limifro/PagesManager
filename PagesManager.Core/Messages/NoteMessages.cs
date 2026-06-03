@@ -2,7 +2,25 @@ using PagesManager.Core.Models;
 
 namespace PagesManager.Core.Messages;
 
-public record NoteSelectedMessage(Note Note);
-public record NoteSavedMessage(Note Note);
-public record NoteDeletedMessage(int NoteId);
-public record CreateNoteRequestedMessage();
+public class NoteSelectedMessage
+{
+    public Note Note { get; }
+    public NoteSelectedMessage(Note note) { Note = note; }
+}
+
+public class NoteSavedMessage
+{
+    public Note Note { get; }
+    public NoteSavedMessage(Note note) { Note = note; }
+}
+
+public class NoteDeletedMessage
+{
+    public int NoteId { get; }
+    public NoteDeletedMessage(int noteId) { NoteId = noteId; }
+}
+
+public class CreateNoteRequestedMessage
+{
+    
+}

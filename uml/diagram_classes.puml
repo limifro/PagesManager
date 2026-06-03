@@ -1,0 +1,112 @@
+@startuml cls
+skinparam classAttributeIconSize 0
+
+package "PagesManager.Core.Models" {
+    class Note {
+        +Id : int
+        +Title : string
+        +Content : string
+        +FontFamily : string
+        +FontSize : double
+        +IsBold : bool
+        +IsItalic : bool
+        +IsUnderline : bool
+        +TextAlignment : string
+        +IsPinned : bool
+        +CreatedAt : DateTime
+        +UpdatedAt : DateTime
+        +Attachments : List<Attachment>
+    }
+
+    class Attachment {
+        +Id : int
+        +NoteId : int
+        +FilePath : string
+        +FileName : string
+        +ContentType : string
+        +AddedAt : DateTime
+    }
+
+    Note "1" *-- "0..*" Attachment
+}
+
+package "PagesManager.Core.Services" {
+    interface INoteService {
+        +GetAllAsync()
+        +GetByIdAsync(id)
+        +CreateAsync(title, content)
+        +UpdateAsync(note)
+        +DeleteAsync(id)
+        +SearchAsync(query)
+        +TogglePinAsync(id)
+        +AttachFileAsync(...)
+        +AddExistingAttachmentAsync(...)
+        +RemoveAttachmentAsync(id)
+    }
+
+    class NoteService {
+        -_fileStorage : IFileStorageService
+        -_db : IAppDbContext
+    }
+
+    NoteService ..|> INoteService
+}
+
+package "PagesManager.ViewModels" {
+    class MainWindowViewModel {
+        +NoteList : NoteListViewModel
+        +NoteEditor : NoteEditorViewModel
+        +IsDarkTheme : bool
+        +ToggleThemeCommand
+        +InitializeAsync()
+    }
+
+    class NoteListViewModel {
+        +Notes : ObservableCollection
+        +SelectedNote : NoteListItemViewModel
+        +SearchQuery : string
+        +CreateNoteCommand
+        +DeleteSelectedCommand
+        +LoadAsync()
+    }
+
+    class NoteEditorViewModel {
+        +Title : string
+        +Content : string
+        +FontFamily : string
+        +FontSize : double
+        +IsBold : bool
+        +IsItalic : bool
+        +IsPinned : bool
+        +Attachments : ObservableCollection
+        +SaveCommand
+        +DeleteCommand
+        +TogglePinCommand
+        +AttachImageCommand
+    }
+
+    class NoteListItemViewModel {
+        +Title : string
+        +Preview : string
+        +IsPinned : bool
+        +UpdatedAtDisplay : string
+        +Refresh()
+    }
+
+    class AttachmentViewModel {
+        +Id : int
+        +FileName : string
+        +FilePath : string
+    }
+
+    MainWindowViewModel *-- NoteListViewModel
+    MainWindowViewModel *-- NoteEditorViewModel
+    NoteListViewModel o-- NoteListItemViewModel
+    NoteEditorViewModel o-- AttachmentViewModel
+}
+
+NoteService ..> Note
+NoteListViewModel ..> INoteService
+NoteEditorViewModel ..> INoteService
+
+@enduml

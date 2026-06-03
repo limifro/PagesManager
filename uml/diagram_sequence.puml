@@ -1,0 +1,16 @@
+@startuml arch
+actor Пользователь
+
+Пользователь -> NoteEditorViewModel : нажимает "Сохранить"
+NoteEditorViewModel -> NoteService : UpdateAsync(note)
+NoteService -> AppDbContext : SaveChangesAsync()
+AppDbContext --> NoteService : ok
+NoteService -> AppDbContext : AddExistingAttachmentAsync (если есть)
+NoteService --> NoteEditorViewModel : ok
+NoteEditorViewModel -> NoteService : GetByIdAsync(id)
+NoteService --> NoteEditorViewModel : обновлённая заметка
+NoteEditorViewModel -> IMessenger : Send(NoteSavedMessage)
+IMessenger -> NoteListViewModel : OnNoteSaved()
+NoteListViewModel -> NoteListItemViewModel : Refresh()
+
+@enduml

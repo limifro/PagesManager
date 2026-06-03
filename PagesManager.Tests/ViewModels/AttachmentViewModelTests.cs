@@ -1,6 +1,6 @@
 using FluentAssertions;
 using PagesManager.Core.Models;
-using PagesManager.Core.ViewModels;
+using PagesManager.ViewModels;
 
 namespace PagesManager.Tests.ViewModels;
 

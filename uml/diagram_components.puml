@@ -1,0 +1,31 @@
+@startuml comp
+package "PagesManager (UI)" {
+    [Views]
+    [ViewModels]
+    [Services (Avalonia)]
+    [App / Program]
+}
+
+package "PagesManager.Core" {
+    [Models]
+    [Services]
+    [Data / DbContext]
+    [Messages]
+    [Migrations]
+}
+
+package "PagesManager.Tests" {
+    [ViewModels Tests]
+    [Services Tests]
+    [Helpers / Fakes]
+}
+
+[Views] --> [ViewModels]
+[ViewModels] --> [Services]
+[App / Program] --> [Data / DbContext]
+[Services] --> [Models]
+[Services] --> [Data / DbContext]
+[ViewModels Tests] --> [ViewModels]
+[Services Tests] --> [Services]
+
+@enduml

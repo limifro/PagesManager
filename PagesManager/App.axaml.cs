@@ -3,7 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using PagesManager.Core.Services;
-using PagesManager.Core.ViewModels;
+using PagesManager.ViewModels;
 using PagesManager.Views;
 
 namespace PagesManager;

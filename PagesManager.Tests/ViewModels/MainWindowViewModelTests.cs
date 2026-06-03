@@ -1,8 +1,10 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using PagesManager.Core.Messages;
-using PagesManager.Core.Models;
 using PagesManager.Core.Services;
-using PagesManager.Core.ViewModels;
+using PagesManager.ViewModels;
 using PagesManager.Tests.Helpers;
 
 namespace PagesManager.Tests.ViewModels;
@@ -15,9 +17,8 @@ public class MainWindowViewModelTests
         out FakeThemeService themeService)
     {
         var db = TestDbContextFactory.Create();
-        var clock = new TestClock(DateTime.UtcNow);
         var storage = new FakeFileStorageService();
-        service = new NoteService(storage, db, clock);
+        service = new NoteService(storage, db);
 
         spy = new MessengerSpy();
         themeService = new FakeThemeService();
@@ -59,7 +60,6 @@ public class MainWindowViewModelTests
         var vm = CreateVm(out _, out _, out var themeService);
 
         vm.IsDarkTheme.Should().BeFalse();
-
         vm.ToggleThemeCommand.Execute(null);
 
         themeService.ToggleCount.Should().Be(1);

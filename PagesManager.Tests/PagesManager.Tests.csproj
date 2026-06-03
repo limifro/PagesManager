@@ -34,4 +34,9 @@
     <ProjectReference Include="..\PagesManager.Core\PagesManager.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PagesManager.Core\PagesManager.Core.csproj" />
+    <ProjectReference Include="..\PagesManager\PagesManager.csproj" />
+</ItemGroup>
+
 </Project>

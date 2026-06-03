@@ -14,7 +14,6 @@ namespace PagesManager.Core.Migrations
     [Migration("20260512072225_InitialCreate")]
     partial class InitialCreate
     {
-        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
@@ -74,8 +73,22 @@ namespace PagesManager.Core.Migrations
                     b.Property<double>("FontSize")
                         .HasColumnType("REAL");
 
+                    b.Property<bool>("IsBold")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsItalic")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("IsPinned")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsUnderline")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TextAlignment")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()

@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace PagesManager.Core.Migrations
 {
-    /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -21,9 +19,13 @@ namespace PagesManager.Core.Migrations
                     Content = table.Column<string>(type: "TEXT", nullable: false),
                     FontFamily = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     FontSize = table.Column<double>(type: "REAL", nullable: false),
+                    IsBold = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsItalic = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsUnderline = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TextAlignment = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    IsPinned = table.Column<bool>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsPinned = table.Column<bool>(type: "INTEGER", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -59,14 +61,10 @@ namespace PagesManager.Core.Migrations
                 column: "NoteId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Attachments");
-
-            migrationBuilder.DropTable(
-                name: "Notes");
+            migrationBuilder.DropTable(name: "Attachments");
+            migrationBuilder.DropTable(name: "Notes");
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PagesManager.Core.Data;
-using PagesManager.Core.Helpers;
 using PagesManager.Core.Models;
 
 namespace PagesManager.Core.Services;
@@ -15,16 +14,11 @@ public class NoteService : INoteService
 {
     private readonly IFileStorageService _fileStorage;
     private readonly IAppDbContext _db;
-    private readonly IClock _clock;
 
-    public NoteService(
-        IFileStorageService fileStorage,
-        IAppDbContext db,
-        IClock clock)
+    public NoteService(IFileStorageService fileStorage, IAppDbContext db)
     {
         _fileStorage = fileStorage;
         _db = db;
-        _clock = clock;
     }
 
     public async Task<IReadOnlyList<Note>> GetAllAsync(CancellationToken ct = default)
@@ -47,7 +41,7 @@ public class NoteService : INoteService
 
     public async Task<Note> CreateAsync(string title = "Новая заметка", string content = "", CancellationToken ct = default)
     {
-        var now = _clock.UtcNow;
+        var now = DateTime.UtcNow;
         var note = new Note
         {
             Title = string.IsNullOrWhiteSpace(title) ? "Новая заметка" : title.Trim(),
@@ -77,7 +71,7 @@ public class NoteService : INoteService
         tracked.IsUnderline = note.IsUnderline;
         tracked.TextAlignment = note.TextAlignment;
         tracked.IsPinned = note.IsPinned;
-        tracked.UpdatedAt = _clock.UtcNow;
+        tracked.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync(ct);
     }
@@ -122,7 +116,7 @@ public class NoteService : INoteService
         if (note is null) return;
 
         note.IsPinned = !note.IsPinned;
-        note.UpdatedAt = _clock.UtcNow;
+        note.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
     }
 
@@ -141,11 +135,11 @@ public class NoteService : INoteService
             FilePath = savedPath,
             FileName = originalFileName,
             ContentType = contentType ?? string.Empty,
-            AddedAt = _clock.UtcNow
+            AddedAt = DateTime.UtcNow
         };
 
         _db.Attachments.Add(attachment);
-        note.UpdatedAt = _clock.UtcNow;
+        note.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
 
         return attachment;
@@ -170,11 +164,11 @@ public class NoteService : INoteService
             FilePath = filePath,
             FileName = fileName ?? string.Empty,
             ContentType = contentType ?? string.Empty,
-            AddedAt = _clock.UtcNow
+            AddedAt = DateTime.UtcNow
         };
 
         _db.Attachments.Add(attachment);
-        note.UpdatedAt = _clock.UtcNow;
+        note.UpdatedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
 
         return attachment;
