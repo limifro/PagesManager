@@ -5,7 +5,7 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
           <Format>opencover</Format>
-          <Exclude>[*]PagesManager.Core.Migrations.*,[*]PagesManager.Core.ServiceCollectionExtensions,[*]PagesManager.Core.Data.AppDbContextFactory,[*]PagesManager.Core.Services.NoteRepository</Exclude>
+          <Exclude>[*]PagesManager.Core.Migrations.*,[*]PagesManager.Core.ServiceCollectionExtensions,[*]PagesManager.Core.Data.AppDbContextFactory,[*]PagesManager.Core.Services.NoteRepository,[PagesManager]PagesManager.Converters.*,[PagesManager]PagesManager.Services.*,[PagesManager]PagesManager.App,[PagesManager]PagesManager.Program,[PagesManager]PagesManager.ServiceCollectionExtensions</Exclude>
           <ExcludeByAttribute>Obsolete,GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
           <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
         </Configuration>
